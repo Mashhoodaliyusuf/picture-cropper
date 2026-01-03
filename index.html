@@ -1,1 +1,1202 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Picture Cropper Online - Circle Cropper, Heart Cropper, Star Cropper</title>
+<meta name="description" content="
+Do you want to crop your picture for free with unique shapes like rectangle, circle, heart, star, rhombus etc? We have created this image cropping tool from our experience of 
+dealing with images from the last 10 years. This online photo cropping tool is completly free to use and without signup. We have almost 10 years of experience in dealing with
+image manipulation services like image editing, image cropping, image compressor or enhancer etc.
+">
+<link rel="canonical" href="https://www.pythonware.com/image-converter/picture-cropper" />
+<link rel="icon" type="image/png" href="icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800;900&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+
+<style>
+
+ :root {
+            --primary: #2A5BFF;
+            --primary-dark: #1E4AD9;
+            --secondary: #FF6B6B;
+            --dark: #1A1A2E;
+            --light: #F8F9FF;
+            --gray: #6C757D;
+            --gray-light: #E9ECEF;
+            --success: #28A745;
+            --border-radius: 12px;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+  body { 
+    margin:0; 
+    font-family: 'Segoe UI', system-ui, sans-serif; 
+    background:rgb(56, 55, 55); 
+    color: #333; 
+    
+    touch-action: manipulation;
+    background-color: #f2f3f7;
+    background-color: #eff0f5;
+  }
+  #main{
+    width:90%;
+    min-height:calc(100vh - 50px);
+    max-height:auto;
+    overflow-y: auto;
+    margin:80px auto;
+    border-radius:10px;
+    position:relative;
+
+  }
+ 
+
+  #h1{ 
+    margin:80px 20px 5px 10px;
+    font-size: 30px;
+    font-family: Poppins, sans-serif;
+    font-weight: 800;
+  }
+  #h1p{
+    margin:0px 20px 10px 10px;
+    font-size: 17px;
+    text-align: center;
+  }
+ 
+ .imgsec{width:46%;height:490px;float:left;margin-top:10px} 
+ .imgsec img{height:100%;float:right;border-radius:10px;border-radius:0px 0px 100px 200px}
+  
+ 
+  
+  
+  .filesec{width:50%;height:470px;float:right;margin-top:10px;display:flex;flex-direction:column;align-items:center}
+  
+  .header-subtitle { 
+    text-align: center; 
+    color: #64748b; 
+    margin-bottom: 2rem; 
+    font-size: 1.1rem; 
+  }
+  #logoimg{
+    width:50px;
+    position:absolute;
+    top:40px;
+    left:10px;
+  }
+  
+  .upload-zone { 
+    border: 3px dashed #cbd5e1; 
+    border-radius: 16px; 
+    background: #fff; 
+    padding: 40px 20px; 
+    text-align: center; 
+    cursor: pointer; 
+    transition: all .3s; 
+    margin-bottom: 2rem; 
+    width:80%;
+    margin-top:20px;
+  }
+  .upload-zone.dragover { 
+    background: #eff6ff; 
+    border-color: #3e8d75;
+  }
+  .upload-text { 
+    font-size: 1.5rem; 
+    color: #475569; 
+    margin-bottom: 0.5rem;
+  }
+  .upload-hint { 
+    color: #94a3b8; 
+  }
+  .hidden { display: none; }
+  #footer { 
+    width:90%;
+    background-color:white;
+    margin:50px auto;
+    font-family: arial;
+    border-radius: 10px; 
+    padding: 20px;
+  }
+  #footer h2, p{
+    margin:20px 0;
+    line-height:25px
+  }
+  .cropper-wrapper {
+    width: 1000px;
+    margin: 0 auto;
+    z-index:9999;
+  }
+  .crop-area {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    touch-action: none;
+  }
+  #imageContainer {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+    touch-action: none;
+  }
+  #cropImage {
+    max-width: 100%;
+    max-height: 70vh;
+    display: block;
+  }
+  .crop-overlay {
+    position: absolute;
+    border: 3px dashed #3e8d75;
+    background: rgba(62, 141, 117, 0.15);
+    cursor: move;
+    display: none;
+    touch-action: none;
+  }
+  .shape-mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .handle {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    background: #3e8d75;
+    border: 3px solid white;
+    border-radius: 50%;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    touch-action: none;
+  }
+  .handle.nw { top: -12px; left: -12px; cursor: nwse-resize; }
+  .handle.ne { top: -12px; right: -12px; cursor: nesw-resize; }
+  .handle.sw { bottom: -12px; left: -12px; cursor: nesw-resize; }
+  .handle.se { bottom: -12px; right: -12px; cursor: nwse-resize; }
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: center;
+    align-items: end;
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  }
+  .control-group {
+    display: flex;
+    flex-direction: column;
+  }
+  .control-group label {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #333;
+  }
+  select, input[type=number] {
+    padding: 0.8rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+  }
+  .download-btn {
+    padding: 1rem 2.5rem;
+    background: #3e8d75;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .download-btn:hover {
+    background: #3e8e41;
+  }
+  .shape-preview {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .shape-btn {
+    width: 50px;
+    height: 50px;
+    background: #f0f0f0;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+  }
+  .shape-btn.active {
+    border-color: #3e8d75;
+    background: #e6f4f1;
+    box-shadow: 0 0 10px rgba(62,141,117,0.3);
+  }
+
+  .top{width:100%;display:table;margin:100px auto;background-color:white;padding:100px 0;background: linear-gradient(to right, #e74e8f, #f8644a); }
+  .topleft{width:40%;height:400px;float:left;margin-left:20px;text-align:center;}
+  .topleft h2{color:#737373;font-size:38px;font-family: Poppins, sans-serif;color:white;}
+  .topleft h3{color:#3399ff;color:#00b386;font-size:45px;font-family:cursive;font-style:italic;margin-top:-20px}
+  .topright{width:48%;height:auto;float:right;box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;border-radius:20px;overflow:hidden;margin-right:50px}
+
+  .top2{width:100%;display:table;margin:100px auto;background-color:white;padding:200px 0;}
+  .top2 h2{font-family: tahoma;font-size:40px;text-align:center;color:#4d4d4d}
+  .top2 li{color:#737373}
+  .top2left{width:40%;height:auto;float:left;text-align:center;border:0px solid;margin-left:80px;margin-top:50px;overflow:hidden;border-radius:50px}
+  .top2left video{width:100%;float:right;}
+  .top2right h3{color:#666666;font-size:22px;font-family:tahoma}
+  .top2right strong{color:#737373;font-size:16px;font-family:arial;font-weight:lighter;line-height:28px}
+   .top2right p{margin-top:-13px}
+  .top2right{width:40%;height:auto;float:left;overflow:hidden;margin-left:50px;border:0px solid;padding:0px;margin-top:50px}
+ 
+ 
+  .top3{width:80%;display:table;margin:100px auto;background-color:white;padding:100px 0;}
+  .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            margin-bottom: 15px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            border: 1px solid var(--gray-light);
+        }
+
+        .faq-question {
+            padding: 22px 25px;
+            background-color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .faq-question:hover {
+            background-color: var(--light);
+        }
+
+        .faq-question i {
+            transition: var(--transition);
+        }
+
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            padding: 0 25px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background-color: white;
+        }
+
+        .faq-item.active .faq-answer {
+            padding: 0 25px 25px;
+            max-height: 300px;
+        }
+
+
+ #header{
+    width:100%;
+    height:60px;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position:fixed;top:0;
+    z-index:9999;
+    border-bottom:1px solid #d9d9d9;
+  }
+  #header h1{
+    font-size:16px; 
+    font-family:arial;
+    font-weight:lighter;
+    color:white
+  }
+  #header img{width:170px;margin-left:50px}
+  #header p{font-family:arial;margin-right:50px}
+  #header p a{margin-left:40px;text-decoration:none;color:#262626;font-family:helvetica}
+  #header button{background-color:#262626;color:white;padding:9px 18px;border-radius:9px;cursor:pointer;border:none;font-family:helvetica}
+  #header button:hover{background-color:#404040;color:#f2f2f2;border:none}  
+  
+  
+  
+  /* Footer */
+        footer {
+            background-color:#1A1A2E;
+            color: white;
+            padding: 70px 20px 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 50px;
+            margin-bottom: 50px;
+        }
+
+        .footer-logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .footer-about p {
+            opacity: 0.7;
+            margin-bottom: 25px;
+            line-height: 1.8;
+        }
+
+        .footer-links h4 {
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        .footer-links ul {
+            list-style: none;
+            margin-left:-40px;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: white;
+            padding-left: 5px;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0.6;
+            font-size: 0.9rem;
+        }
+  
+ @media (min-width: 200px) and (max-width: 800px) {
+ #header p{display:none}  
+    #main{
+      width:95%;
+      min-height:auto;
+      overflow-y: auto;
+      margin:10px auto;
+      border-radius:10px;
+      background-color:#f1f5f9;
+      opacity:1;
+      box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    }
+
+  #header{
+    width:100%;
+    height:50px;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position:fixed;top:0;
+    z-index:9999;
+    border-bottom:1px solid #d9d9d9;
+  }
+  #header h1{
+    font-size:16px; 
+    font-family:arial;
+    font-weight:lighter;
+    color:white
+  }
+  #header img{width:110px;margin-left:10px}
+
+  #main{
+    width:100%;
+    height:auto;
+    margin:70px auto;
+    border-radius:10px;
+    position:relative
+    background-color: red;
+  }
+
+    
+.leftimage{width:70%;height:auto;padding-bottom:10px;float:none;margin-left:0px;margin:auto;}
+.rightfile{width:90%;height:420px;float:none;margin-right:0px;margin:auto;} 
+
+ .imgsec{width:90%;height:auto;padding-bottom:10px;float:none;margin-left:0px;margin:auto;} 
+ .imgsec img{width:100%}
+ .filesec{width:90%;height:auto;float:none;margin-right:0px;margin:auto;} 
+    
+  .wrapper{ 
+    width: 90%; 
+    height: 0px; 
+    padding: 10px; 
+    border-radius: 9px; 
+    transition: height 0.2s ease; 
+    margin:-20px auto; 
+    color:white; 
+    font-family:arial;
+  }   
+  
+.top1{width:100%;display:table;background-color:white;margin:50px auto;padding:100px 0}
+.top1left{width:98%;height:auto;float:none;margin:auto;}
+.top1right{width:95%;height:auto;float:none;margin:20px auto}
+.top1right h2{font-size:23px;margin:0;padding:0;}
+.top1right h3{font-size:19px;margin:0;padding:0;margin-top:25px;}
+.top1right p{font-size:16px;margin-top:10px;padding:0;}  
+    
+
+
+
+ .top{width:100%;display:table;margin:100px auto;background-color:white;padding:50px 0;background: linear-gradient(to right, #e74e8f, #f8644a); }
+  .topleft{width:95%;height:300px;float:none;margin-left:0px;text-align:center;margin:auto;}
+  .topleft h2{color:#737373;font-size:38px;font-family: Poppins, sans-serif;color:white;}
+  .topleft h3{color:#3399ff;color:#00b386;font-size:35px;font-family:cursive;font-style:italic;margin-top:-20px}
+  .topright{width:95%;height:auto;float:none;box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;border-radius:20px;overflow:hidden;margin-right:0px;margin:auto;}
+
+  .top2{width:95%;display:table;margin:100px auto;background-color:white;padding:200px 0;}
+  .top2 h2{font-family: tahoma;font-size:40px;text-align:center;color:#4d4d4d}
+  .top2 li{color:#737373}
+  .top2left{width:98%;height:auto;float:none;text-align:center;border:0px solid;margin-left:0px;margin-top:50px;overflow:hidden;border-radius:50px;margin:auto;}
+  .top2left video{width:100%;float:right;}
+  .top2right h3{color:#666666;font-size:22px;font-family:tahoma;margin-top:20px;}
+  .top2right strong{color:#737373;font-size:16px;font-family:arial;font-weight:lighter;line-height:28px}
+   .top2right p{margin-top:-13px;color:black;font-weight:bold}
+  .top2right{width:95%;height:auto;float:none;overflow:hidden;margin-left:0px;border:0px solid;padding:0px;margin-top:50px;margin:auto}
+ 
+ 
+  .top3{width:96%;display:table;margin:100px auto;background-color:white;padding:100px 0;}
+  .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            margin-bottom: 15px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            border: 1px solid var(--gray-light);
+        }
+
+        .faq-question {
+            padding: 22px 25px;
+            background-color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .faq-question:hover {
+            background-color: var(--light);
+        }
+
+        .faq-question i {
+            transition: var(--transition);
+        }
+
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            padding: 0 25px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background-color: white;
+        }
+
+        .faq-item.active .faq-answer {
+            padding: 0 25px 25px;
+            max-height: 300px;
+        }
+    
+    
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            
+            .step:not(:last-child)::after {
+                display: none;
+            }    
+  } 
+    
+}
+ 
+  
+</style>
+</head>
+<body>
+
+
+
+<div id="header">
+
+<a href="https://www.pythonware.com/image-converter"><img src="pythonware.png" style="height:80%" alt="pythonware logo" /></a>
+<p>
+<a href="https://www.pythonware.com/image-converter/image-size-reducer">Image Size Reducer</a>
+<a href="https://www.pythonware.com/image-converter/photo-enhancer">Image Enhancer</a>
+<a href="https://www.pythonware.com/image-converter/pic-to-sketch-converter">PIC to Sketch</a>
+<a href="https://www.pythonware.com/image-converter/pic-to-pdf">PIC to PDF</a>
+</p>
+
+</div>    
+  <div id="main">
+
+    
+     
+      
+
+      <div class="imgsec" id="imgsec">
+          <img src="image-cropping.gif" alt="image cropping animation" />
+      </div>
+      
+      <div class="filesec" id="filesec">
+      <h1 id="h1">Picture Cropper</h1>
+      <p id="h1p">Crop your photo in rectangle, circle, heart, star and rhombus shapes</p>
+      <div id="dropArea" class="upload-zone">
+        <div class="upload-text">Drop your image here or click to upload</div>
+        <p class="upload-hint">No upload • No watermark • Works offline</p>
+        <input type="file" id="fInput" accept="image/*" class="hidden">
+      </div>
+      </div>
+     
+
+      <div class="cropper-wrapper" id="cropper" style="display:none;">
+        <div class="crop-area">
+          <div id="imageContainer">
+            <img id="cropImage" src="" alt="Image to crop">
+            <div id="cropOverlay" class="crop-overlay">
+              <canvas id="shapeCanvas" class="shape-mask"></canvas>
+              <div class="handle nw"></div>
+              <div class="handle ne"></div>
+              <div class="handle sw"></div>
+              <div class="handle se"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <div class="control-group">
+            <label>Crop Shape</label>
+            <div class="shape-preview">
+              <div class="shape-btn active" data-shape="rectangle">□</div>
+              <div class="shape-btn" data-shape="circle">○</div>
+              <div class="shape-btn" data-shape="heart">♥</div>
+              <div class="shape-btn" data-shape="star">★</div>
+              <div class="shape-btn" data-shape="rhombus">◆</div>
+            </div>
+          </div>
+          <div class="control-group">
+            <label>Aspect Ratio</label>
+            <select id="ratioSelect">
+              <option value="free">Free</option>
+              <option value="1:1">Square 1:1</option>
+              <option value="16:9">16:9</option>
+              <option value="9:16">9:16</option>
+              <option value="4:3">4:3</option>
+              <option value="3:2">3:2</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label>Width (px)</label>
+            <input type="number" id="cropWidth" value="400" min="50">
+          </div>
+          <div class="control-group">
+            <label>Height (px)</label>
+            <input type="number" id="cropHeight" value="400" min="50">
+          </div>
+          <div class="control-group">
+            <button class="download-btn">Download Cropped Image</button>
+          </div>
+    
+      </div>
+    </div>
+  </div>
+
+
+<div class="top">
+       <div class="topleft">
+           <br><br><br><br><br>
+           <h2>Crop Pictures in</h2>
+           <h3 id="typing-text"></h3>
+       </div>
+       <div class="topright">
+           <img src="imagecrop.png" style="width:100%" alt="image" />
+       </div>
+</div>
+
+
+
+
+<div class="top2">
+    <h2>Why Our Image Cropping Tool Is the Best on the Market</h2>
+    
+    <div class="top2left">
+        
+  <video autoplay muted loop playsinline>
+    <source src="croppingvideo.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+        
+    </div>
+    <div class="top2right">
+        
+        <h3>Multiple Cropping Shapes</h3>
+        <p><strong>
+            Crop images in various shapes to fit any use case, from standard rectangles to custom designs.</strong>
+        </p>
+        
+        <h3>Unlimited Cropping</h3>
+        <p><strong>Crop as many images as you want without restrictions or limits.</strong></p>
+        
+        <h3>No Signup Required</h3>
+        <p><strong>Start cropping instantly without creating an account or sharing personal details.</strong></p>
+        
+        <h3>Completely Free</h3>
+        <p><strong>Enjoy all features at no cost, with no hidden fees or premium locks.</strong></p>
+        
+        <h3>Strong Data Security</h3>
+        <p><strong>Your images are never stored on our servers; everything is processed securely and privately.</strong></p>
+        
+        <h3>High-Quality Output</h3>
+<p><strong>
+    Preserve original image quality with precise cropping and no compression loss.
+</strong></p>
+
+<h3>Fast & Easy to Use</h3>
+<p><strong>
+    Crop images in seconds with an intuitive interface designed for speed and simplicity.
+</strong></p>
+        
+    </div>
+    
+   
+</div>    
+
+
+<div class="top3">
+<!-- FAQ Section -->
+    <section id="faq">
+        <div class="container">
+            <div class="section-header">
+                <h2><p align="center">Frequently asked questions</p></h2>
+                <p align="center">Find quick answers to common questions.</p>
+            </div>
+            <div class="faq-container">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>What image formats does this tool support?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>The tool support all major image formats including JPEG, PNG, WebP, GIF, and TIFF. You can export your cropped images in PNG (with transparency), JPEG, or WebP format.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Can I create custom crop shapes?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>We support various coomon shapes like rectangle, square, rhombus, circle, star and heart. We are planning to include more shapes and a feature for 
+                        custom shapes in coming future.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Is there a limit to how many images I can crop?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>No, you can crop as many images as possible and for free and forever. We are also not planning to limit your usage in the future.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Are my pictures safe and secure?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Of course yes. We do not upload or save your pictures at our server. All your images are processed using your own browser resources. We strictly obey
+                        user privacy. Read our <a href="https://pythonware.com/privacy" target="_blank">privacy policy</a></p>
+                    </div>
+                </div>
+    
+              
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Can I use this tool on mobile devices?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Absolutely! this cropping tool works on all devices through your web browser. We also offer native iOS and Android apps for cropping on the go.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>    
+</div>
+
+ 
+ 
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-about">
+                    <div class="footer-logo">
+                        <i class="fas fa-crop-alt"></i>Pythonware
+                    </div>
+                    <p>Advanced image processing for professionals. Manipulate images for your requirement.</p>
+                    <div style="display: flex; gap: 15px; margin-top: 20px;">
+                        <a href="https://www.linkedin.com/in/real-mashhood-ali/" target="_blank" style="color: white; font-size: 1.2rem;"><i class="fab fa-github"></i></a>
+                        <a href="https://www.linkedin.com/in/real-mashhood-ali/" target="_blank" style="color: white; font-size: 1.2rem;"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Product</h4>
+                    <ul>
+        <li><a href="https://www.pythonware.com/image-converter/picture-cropper">Picture Cropper</a></li>
+        <li><a href="https://www.pythonware.com/image-converter/image-size-reducer">Image Size Reducer</a></li>
+        <li><a href="https://www.pythonware.com/image-converter/photo-enhancer">Photo Enhancer</a></li>
+        <li><a href="https://www.pythonware.com/image-converter/pic-to-sketch-converter">PIC to Sketch Converter</a></li>
+        <li><a href="https://www.pythonware.com/image-converter/pic-to-pdf">PIC to PDF Converter</a></li>
+        <li><a href="https://www.pythonware.com/image-converter/pic-to-sketch-converter">Pic to Sketch Converter</a></li>
+        <li><a href="https://www.pythonware.com/image-converter/photo-collage-maker-online-free">Photo Collage Maker</a></li>
+        <li><a href="https://www.pythonware.com/image-converter/reverse-picture-lookup">Reverse Picture Lookup</a></li>
+        <li><a href="https://www.pythonware.com/image-converter/resize-image-without-losing-quality">Resize Image Without Loosing Quality</a></li>
+        <li><a href="https://www.pythonware.com/image-converter/heic-to-jpg-image-converter">HEIC to JPG Converter</a></li>    
+        <li><a href="https://www.pythonware.com/image-converter/heic-to-png-image-converter">HEIC to PNG Cnverter</a></li>   
+        <li><a href="https://www.pythonware.com/image-converter/tif-to-jpg-image-converter">TIF to JPG Converter</a></li>   
+        <li><a href="https://www.pythonware.com/image-converter/tif-to-png-image-converter">TIF to PNG Converter</a></li>
+        <li><a href="https://www.pythonware.com/image-converter/webp-to-jpg-image-converter">WEBP to JPG Converter</a></li>   
+        <li><a href="https://www.pythonware.com/image-converter/webp-to-png-image-converter">WEBP to PNG Converter</a></li> 
+                    </ul>
+                </div>
+                <div class="footer-links">
+
+                </div>
+                <div class="footer-links">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="https://pythonware.com/privacy">Privacy Policy</a></li>
+              
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 Pythonware All rights reserved.</p>
+            </div>
+        </div>
+    </footer>   
+
+
+<script>
+const dropArea = document.getElementById("dropArea");
+const fInput = document.getElementById("fInput");
+const cropper = document.getElementById("cropper");
+const imgsec = document.getElementById("imgsec");
+const filesec = document.getElementById("filesec");
+const cropImage = document.getElementById("cropImage");
+const cropOverlay = document.getElementById("cropOverlay");
+const shapeCanvas = document.getElementById("shapeCanvas");
+const ratioSelect = document.getElementById("ratioSelect");
+const cropWidthInput = document.getElementById("cropWidth");
+const cropHeightInput = document.getElementById("cropHeight");
+const downloadBtn = document.querySelector(".download-btn");
+const shapeBtns = document.querySelectorAll(".shape-btn");
+
+let naturalW, naturalH;
+let cropX = 0, cropY = 0, cropW = 400, cropH = 400;
+let currentShape = "rectangle";
+let isDragging = false, isResizing = false, currentHandle = '';
+let startX, startY;
+
+function loadImage(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    cropImage.src = e.target.result;
+    cropImage.onload = () => {
+      naturalW = cropImage.naturalWidth;
+      naturalH = cropImage.naturalHeight;
+      cropper.style.display = "block";
+      dropArea.style.display = "none";
+      imgsec.style.display = "none";
+      filesec.style.display = "none";
+      initCrop();
+    };
+  };
+  reader.readAsDataURL(file);
+}
+
+function initCrop() {
+  cropW = Math.min(500, naturalW * 0.7);
+  cropH = cropW;
+  cropX = (naturalW - cropW) / 2;
+  cropY = (naturalH - cropH) / 2;
+  updateOverlay();
+  cropOverlay.style.display = "block";
+}
+
+function updateOverlay() {
+  const scaleX = cropImage.width / naturalW;
+  const scaleY = cropImage.height / naturalH;
+
+  cropOverlay.style.left = `${cropX * scaleX}px`;
+  cropOverlay.style.top = `${cropY * scaleY}px`;
+  cropOverlay.style.width = `${cropW * scaleX}px`;
+  cropOverlay.style.height = `${cropH * scaleY}px`;
+
+  shapeCanvas.width = cropW * scaleX;
+  shapeCanvas.height = cropH * scaleY;
+  drawShapeOnCanvas();
+
+  cropWidthInput.value = Math.round(cropW);
+  cropHeightInput.value = Math.round(cropH);
+}
+
+function drawShapeOnCanvas() {
+  const ctx = shapeCanvas.getContext("2d");
+  ctx.clearRect(0, 0, shapeCanvas.width, shapeCanvas.height);
+  ctx.fillStyle = "rgba(62, 141, 117, 0.3)";
+
+  const w = shapeCanvas.width;
+  const h = shapeCanvas.height;
+  const cx = w / 2;
+  const cy = h / 2;
+  const size = Math.min(w, h);
+
+  ctx.beginPath();
+  if (currentShape === "rectangle") {
+    ctx.rect(0, 0, w, h);
+  } else if (currentShape === "circle") {
+    ctx.arc(cx, cy, size / 2, 0, Math.PI * 2);
+  } else if (currentShape === "heart") {
+    // Fixed heart shape - centered and not cut off
+    const s = size / 220;
+    ctx.moveTo(cx, cy - 25 * s);
+    ctx.bezierCurveTo(cx - 55 * s, cy - 75 * s, cx - 95 * s, cy - 50 * s, cx - 95 * s, cy - 5 * s);
+    ctx.bezierCurveTo(cx - 95 * s, cy + 40 * s, cx - 45 * s, cy + 75 * s, cx, cy + 105 * s);
+    ctx.bezierCurveTo(cx + 45 * s, cy + 75 * s, cx + 95 * s, cy + 40 * s, cx + 95 * s, cy - 5 * s);
+    ctx.bezierCurveTo(cx + 95 * s, cy - 50 * s, cx + 55 * s, cy - 75 * s, cx, cy - 25 * s);
+  } else if (currentShape === "star") {
+    const spikes = 5;
+    const outer = size * 0.5 * 0.95;
+    const inner = size * 0.5 * 0.45;
+    let rot = Math.PI / 2 * 3;
+    ctx.moveTo(cx + outer * Math.cos(rot), cy + outer * Math.sin(rot));
+    for (let i = 0; i < spikes; i++) {
+      rot += Math.PI / spikes;
+      ctx.lineTo(cx + inner * Math.cos(rot), cy + inner * Math.sin(rot));
+      rot += Math.PI / spikes;
+      ctx.lineTo(cx + outer * Math.cos(rot), cy + outer * Math.sin(rot));
+    }
+    ctx.closePath();
+  } else if (currentShape === "rhombus") {
+    ctx.moveTo(cx, cy - h / 2);
+    ctx.lineTo(cx + w / 2, cy);
+    ctx.lineTo(cx, cy + h / 2);
+    ctx.lineTo(cx - w / 2, cy);
+    ctx.closePath();
+  }
+  ctx.fill();
+}
+
+shapeBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    shapeBtns.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentShape = btn.dataset.shape;
+    if (currentShape !== "rectangle") {
+      cropH = cropW;
+      cropHeightInput.value = cropW;
+    }
+    updateOverlay();
+  });
+});
+
+// Unified function to get coordinates from mouse or touch event
+function getEventCoords(e) {
+  if (e.touches && e.touches.length > 0) {
+    return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  }
+  return { x: e.clientX, y: e.clientY };
+}
+
+// Mouse events
+cropOverlay.addEventListener("mousedown", e => {
+  if (e.target.classList.contains("handle")) {
+    currentHandle = e.target.className.match(/(nw|ne|sw|se)/)[0];
+    isResizing = true;
+  } else if (e.target === cropOverlay || e.target === shapeCanvas) {
+    isDragging = true;
+  }
+  const coords = getEventCoords(e);
+  startX = coords.x;
+  startY = coords.y;
+  e.preventDefault();
+});
+
+// Touch events
+cropOverlay.addEventListener("touchstart", e => {
+  if (e.target.classList.contains("handle")) {
+    currentHandle = e.target.className.match(/(nw|ne|sw|se)/)[0];
+    isResizing = true;
+  } else if (e.target === cropOverlay || e.target === shapeCanvas) {
+    isDragging = true;
+  }
+  const coords = getEventCoords(e);
+  startX = coords.x;
+  startY = coords.y;
+  e.preventDefault();
+}, { passive: false });
+
+function handleMove(e) {
+  if (!isDragging && !isResizing) return;
+
+  const scaleX = cropImage.width / naturalW;
+  const scaleY = cropImage.height / naturalH;
+  const coords = getEventCoords(e);
+  const dx = (coords.x - startX) / scaleX;
+  const dy = (coords.y - startY) / scaleY;
+
+  if (isDragging) {
+    cropX += dx;
+    cropY += dy;
+    cropX = Math.max(0, Math.min(cropX, naturalW - cropW));
+    cropY = Math.max(0, Math.min(cropY, naturalH - cropH));
+  }
+
+  if (isResizing) {
+    if (currentShape === "rectangle") {
+      if (currentHandle.includes("e")) cropW += dx;
+      if (currentHandle.includes("w")) { cropW -= dx; cropX += dx; }
+      if (currentHandle.includes("s")) cropH += dy;
+      if (currentHandle.includes("n")) { cropH -= dy; cropY += dy; }
+
+      if (ratioSelect.value !== "free") {
+        const [rw, rh] = ratioSelect.value.split(":").map(Number);
+        cropH = cropW * (rh / rw);
+      }
+    } else {
+      let delta = 0;
+      if (currentHandle === "se") delta = Math.max(dx, dy);
+      else if (currentHandle === "sw") delta = Math.max(-dx, dy);
+      else if (currentHandle === "ne") delta = Math.max(dx, -dy);
+      else if (currentHandle === "nw") delta = Math.max(-dx, -dy);
+
+      const newSize = cropW + delta * 2;
+      if (newSize >= 50 && newSize <= Math.min(naturalW - cropX, naturalH - cropY)) {
+        cropW = newSize;
+        cropH = newSize;
+        if (currentHandle.includes("w")) cropX -= delta * 2;
+        if (currentHandle.includes("n")) cropY -= delta * 2;
+      }
+    }
+
+    cropW = Math.max(50, Math.min(cropW, naturalW - cropX));
+    cropH = Math.max(50, Math.min(cropH, naturalH - cropY));
+  }
+
+  startX = coords.x;
+  startY = coords.y;
+  updateOverlay();
+  e.preventDefault();
+}
+
+document.addEventListener("mousemove", handleMove);
+document.addEventListener("touchmove", handleMove, { passive: false });
+
+function handleEnd() {
+  isDragging = false;
+  isResizing = false;
+  currentHandle = '';
+}
+
+document.addEventListener("mouseup", handleEnd);
+document.addEventListener("touchend", handleEnd);
+
+ratioSelect.addEventListener("change", () => {
+  if (currentShape === "rectangle" && ratioSelect.value !== "free") {
+    const [w, h] = ratioSelect.value.split(":").map(Number);
+    cropH = cropW * (h / w);
+    updateOverlay();
+  }
+});
+
+cropWidthInput.addEventListener("change", () => {
+  let val = parseInt(cropWidthInput.value);
+  if (val > 0 && val <= naturalW) {
+    cropW = val;
+    if (currentShape !== "rectangle") {
+      cropH = cropW;
+      cropHeightInput.value = cropW;
+    }
+    updateOverlay();
+  }
+});
+
+cropHeightInput.addEventListener("change", () => {
+  let val = parseInt(cropHeightInput.value);
+  if (val > 0 && val <= naturalH) {
+    cropH = val;
+    updateOverlay();
+  }
+});
+
+downloadBtn.addEventListener("click", () => {
+  const canvas = document.createElement("canvas");
+  canvas.width = cropW;
+  canvas.height = cropH;
+  const ctx = canvas.getContext("2d");
+
+  ctx.drawImage(cropImage, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+
+  if (currentShape !== "rectangle") {
+    ctx.globalCompositeOperation = "destination-in";
+    ctx.fillStyle = "#000";
+
+    const cx = cropW / 2;
+    const cy = cropH / 2;
+    const size = Math.min(cropW, cropH);
+
+    ctx.beginPath();
+    if (currentShape === "circle") {
+      ctx.arc(cx, cy, size / 2, 0, Math.PI * 2);
+    } else if (currentShape === "heart") {
+      // Fixed heart shape for download
+      const s = size / 220;
+      ctx.moveTo(cx, cy - 25 * s);
+      ctx.bezierCurveTo(cx - 55 * s, cy - 75 * s, cx - 95 * s, cy - 50 * s, cx - 95 * s, cy - 5 * s);
+      ctx.bezierCurveTo(cx - 95 * s, cy + 40 * s, cx - 45 * s, cy + 75 * s, cx, cy + 105 * s);
+      ctx.bezierCurveTo(cx + 45 * s, cy + 75 * s, cx + 95 * s, cy + 40 * s, cx + 95 * s, cy - 5 * s);
+      ctx.bezierCurveTo(cx + 95 * s, cy - 50 * s, cx + 55 * s, cy - 75 * s, cx, cy - 25 * s);
+    } else if (currentShape === "star") {
+      const spikes = 5;
+      const outer = size * 0.5 * 0.95;
+      const inner = size * 0.5 * 0.45;
+      let rot = Math.PI / 2 * 3;
+      ctx.moveTo(cx + outer * Math.cos(rot), cy + outer * Math.sin(rot));
+      for (let i = 0; i < spikes; i++) {
+        rot += Math.PI / spikes;
+        ctx.lineTo(cx + inner * Math.cos(rot), cy + inner * Math.sin(rot));
+        rot += Math.PI / spikes;
+        ctx.lineTo(cx + outer * Math.cos(rot), cy + outer * Math.sin(rot));
+      }
+      ctx.closePath();
+    } else if (currentShape === "rhombus") {
+      ctx.moveTo(cx, cy - cropH / 2);
+      ctx.lineTo(cx + cropW / 2, cy);
+      ctx.lineTo(cx, cy + cropH / 2);
+      ctx.lineTo(cx - cropW / 2, cy);
+      ctx.closePath();
+    }
+    ctx.fill();
+  }
+
+  canvas.toBlob(blob => {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `cropped-${currentShape}.png`;
+    a.click();
+  }, "image/png");
+});
+
+// Upload handlers
+fInput.addEventListener("change", e => e.target.files[0] && loadImage(e.target.files[0]));
+dropArea.addEventListener("click", () => fInput.click());
+dropArea.addEventListener("dragover", e => { e.preventDefault(); dropArea.classList.add("dragover"); });
+dropArea.addEventListener("dragleave", () => dropArea.classList.remove("dragover"));
+dropArea.addEventListener("drop", e => {
+  e.preventDefault();
+  dropArea.classList.remove("dragover");
+  e.dataTransfer.files[0] && loadImage(e.dataTransfer.files[0]);
+});
+
+
+
+
+
+
+
+const texts = [
+  "Rectangle",
+  "Circle",
+  "Heart",
+  "Star",
+  "Rhombus"
+];
+
+let textIndex = 0;
+let charIndex = 0;
+let isDeleting = false;
+const typingSpeed = 100;
+const deletingSpeed = 60;
+const pauseAfterTyping = 1200;
+
+const typingText = document.getElementById("typing-text");
+
+function typeEffect() {
+  const currentText = texts[textIndex];
+
+  if (!isDeleting) {
+    typingText.textContent = currentText.substring(0, charIndex + 1);
+    charIndex++;
+
+    if (charIndex === currentText.length) {
+      setTimeout(() => isDeleting = true, pauseAfterTyping);
+    }
+  } else {
+    typingText.textContent = currentText.substring(0, charIndex - 1);
+    charIndex--;
+
+    if (charIndex === 0) {
+      isDeleting = false;
+      textIndex = (textIndex + 1) % texts.length;
+    }
+  }
+
+  setTimeout(typeEffect, isDeleting ? deletingSpeed : typingSpeed);
+}
+
+typeEffect();
+
+
+ // FAQ toggle functionality
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const item = question.parentElement;
+                item.classList.toggle('active');
+            });
+        });
+
+</script>
+</body>
+</html>
